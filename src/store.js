@@ -1,4 +1,31 @@
+import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware';
 //1. useBoardStore를 선언하여 zustand 스토어를 생성합니다.
+export const useBoardStore = create(
+    persist(
+        (set) => ({
+            data: [],
+            addBoard: (item) =>
+                set((state) => ({
+                    data: [...state.data, item]
+                })),
+            removeBoard: (id) =>
+                set((state) => ({
+                    data: state.data.filter((item) => item.id !== id)
+                })),
+            updateBoard: (id, newData) =>
+                set((state) => ({
+                    data: state.data.map((item) =>
+                        item.id === id ? {...item, ...newData} : item
+                    )
+                }))
+        }),
+        {
+            name: 'my-storage',
+            storage: createJSONStorage(() => localStorage)
+        }
+    )
+);
 //2. persist 미들웨어를 사용하여 데이터를 localStorage에 저장합니다.
 //3. createJSONStorage를 사용하여 JSON 형식으로 데이터를 저장합니다.
 //4. set 함수를 사용하여 상태를 업데이트하는 메서드를 정의합니다.
